@@ -15,7 +15,7 @@
 	<body>
 	
 		<script src="js/three.js"></script>
-		<script src="http://mamboleoo.be/learnThree/demos/OBJLoader.js"></script>
+		<script src="js/OBJLoader.js"></script>
 		<script src="js/TrackBallControlls.js"></script>
 		<script src="js/MTLLoader.js"></script>
 		<script>
@@ -46,9 +46,9 @@
   function getCamera() {
     var aspectRatio = window.innerWidth / window.innerHeight;
     var camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
-    camera.position.set(0, 1, 100);
+    camera.position.set(100, 100, 100);
     return camera;
-  }
+  };
 
   /**
   * Generate the light to be used in the scene. Light args:
@@ -59,13 +59,9 @@
   **/
 
   function getLight(scene) {
-    var light = new THREE.PointLight(0x4178e2, 1, 0);
-    light.position.set(1, 1, 1);
+    var light = new THREE.DirectionalLight(0xffffff, 1, 0);
+    light.position.set(100, 100, 20);
     scene.add(light);
-
-    var ambientLight = new THREE.AmbientLight(0xcbbd57);
-    scene.add(ambientLight);
-    return light;
   }
 
   /**
@@ -82,7 +78,7 @@
     // Add the canvas to the DOM
     document.body.appendChild(renderer.domElement);
     return renderer;
-  }
+  };
 
   /**
   * Generate the controls to be used in the scene
@@ -92,10 +88,10 @@
 
   function getControls(camera, renderer) {
     var controls = new THREE.TrackballControls(camera, renderer.domElement);
-    controls.zoomSpeed = 0.4;
-    controls.panSpeed = 0.4;
+    controls.zoomSpeed = 0.8;
+    controls.panSpeed = 0.8;
     return controls;
-  }
+  };
 
   /**
   * Load Nimrud model
@@ -103,17 +99,25 @@
 			
 
   function loadModel() {
-	
+	  
+		var mtlLoader = new THREE.MTLLoader();
+    		mtlLoader.load( 'model/shape1.mtl', function( materials ) {
+							materials.preload();
 	  
 							var loader = new THREE.OBJLoader();
-						
-								loader.load( 'model/logotype.obj', function ( object ) {
-										object.rotation.z = Math.PI;
-										object.side = THREE.DoubleSide;
+							
+								loader.setMaterials( materials );
+								
+							loader.load( 'model/center_logo.obj', function ( object ) {
 										scene.add( object );
 										console.log( object ); });
-  };
-  
+							
+							loader.load('model/ring_logo.obj', function (object) {;
+								scene.add( object );
+								console.log( object ); 
+							});
+					  });
+		};
 
   /**
   * Render!
@@ -121,7 +125,7 @@
 
   function render() {
     requestAnimationFrame(render);
-    renderer.render(scene, camera);
+    renderer.render(scene, camera, light);
     controls.update();
   };
 
