@@ -18,6 +18,7 @@
 		<script src="js/OBJLoader.js"></script>
 		<script src="js/TrackBallControlls.js"></script>
 		<script src="js/MTLLoader.js"></script>
+		<script src="js/OrbitControls.js"></script>
 		<script>
 
 
@@ -59,9 +60,14 @@
   **/
 
   function getLight(scene) {
-    var light = new THREE.DirectionalLight(0xffffff, 1, 0);
-    light.position.set(100, 100, 20);
-    scene.add(light);
+var ambient = new THREE.AmbientLight( 0xffffff, 0.5 );
+				scene.add( ambient );
+				spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
+				spotLight.position.set( 15, 40, 35 );
+				spotLight.angle = Math.PI / 4;
+				spotLight.penumbra = 0.05;
+				spotLight.decay = 2;
+				spotLight.distance = 200;
   }
 
   /**
@@ -91,6 +97,15 @@
     controls.zoomSpeed = 0.8;
     controls.panSpeed = 0.8;
     return controls;
+	  
+	  
+	  var controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.minDistance = 50;
+				controls.maxDistance = 300;
+				controls.enablePan = false;
+				controls.target.set( 80, 65, 20 );
+				controls.update();
   };
 
   /**
@@ -100,23 +115,15 @@
 
   function loadModel() {
 	  
-		var mtlLoader = new THREE.MTLLoader();
-    		mtlLoader.load( 'model/shape1.mtl', function( materials ) {
-							materials.preload();
+
 	  
 							var loader = new THREE.OBJLoader();
-							
-								loader.setMaterials( materials );
+
 								
 							loader.load( 'model/center_logo.obj', function ( object ) {
 										scene.add( object );
 										console.log( object ); });
-							
-							loader.load('model/ring_logo.obj', function (object) {;
-								scene.add( object );
-								console.log( object ); 
-							});
-					  });
+
 		};
 
   /**
