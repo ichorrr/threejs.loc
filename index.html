@@ -18,117 +18,142 @@
 	
 		<script src="js/three.js"></script>
 		<script src="js/GLTFLoader.js"></script>
-	<script>
-		
 
-var scene, renderer;
-var camera;
-var mesh;
+		<script>
 
-var isMouseDown = false;
- 
-function init() {
-    
-    scene = new THREE.Scene(); 
-    
-    camera = new THREE.PerspectiveCamera( 15, window.innerWidth/window.innerHeight, 0.1, 1000 ); 
-    camera.position.z = 70; 
+				let scene, renderer;
+				let camera;
+				const mixers = [];
+				const clock = new THREE.Clock();
+				let isMouseDown = false;
 
-    
-    renderer = new THREE.WebGLRenderer(); 
-    renderer.setSize( window.innerWidth, window.innerHeight - 5 ); 
-    document.body.appendChild( renderer.domElement ); 
-	renderer.gammaOutput = true;
-    
-    var light = new THREE.DirectionalLight("#ffffff", 2);
-    var ambient = new THREE.AmbientLight("#ffffff");
-    light.position.set( 0, -170, 100 ).normalize();
-    scene.add(light);
-    scene.add(ambient);
+						function init() {
 
-    var texture = new THREE.Texture();
-    var manager = new THREE.LoadingManager();
-    manager.onProgress = function ( item, loaded, total ) {};
-    var onProgress = function ( xhr ) {};
-    var onError = function ( xhr ) {};
+							scene = new THREE.Scene(); 
+
+							camera = new THREE.PerspectiveCamera( 15, window.innerWidth/window.innerHeight, 0.1, 1000 ); 
+							camera.position.z = 70; 
 
 
-    var loader = new THREE.GLTFLoader();
+							renderer = new THREE.WebGLRenderer(); 
+							renderer.setSize( window.innerWidth, window.innerHeight - 5 ); 
+							document.body.appendChild( renderer.domElement ); 
+							renderer.gammaFactor = 2.2;
+							renderer.gammaOutput = true;
 
-    // Load a glTF resource
-    loader.load(
-        // resource URL
-        'model/logo_blender.gltf',
-        // called when the resource is loaded
-        function ( gltf ) {
+							let light = new THREE.DirectionalLight("#ffffff", 2);
+							let ambient = new THREE.AmbientLight("#ffffff");
+							light.position.set( 0, -170, 100 ).normalize();
+							scene.add(light);
+							scene.add(ambient);
 
-                mesh = gltf.scene;
-                scene.add( mesh );
-
-        },
-        // called when loading is in progresses
-        function ( xhr ) {
-
-                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-        },
-        // called when loading has errors
-        function ( error ) {
-
-                console.log( 'An error happened' );
-
-        }
-    );
-    
-    document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("touchstart", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("touchend", onMouseUp);
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("touchmove", onMouseMove);
-
-    render();   
-}
-
-function render() {
-    requestAnimationFrame( render ); 
-    renderer.render(scene, camera); 
-}
+							let texture = new THREE.Texture();
+							let manager = new THREE.LoadingManager();
+							manager.onProgress = function ( item, loaded, total ) {};
+							let onProgress = function ( xhr ) {};
+							let onError = function ( xhr ) {};
 
 
-function onMouseDown(event) {
-    isMouseDown = true;
-}
+							let loader = new THREE.GLTFLoader();
 
-function onMouseMove(event) {
-    if (isMouseDown) {
-        if ( mesh ) {
-            mesh.rotation.y = getMouseX(event)/50;
-            mesh.rotation.x = getMouseY(event)/50;
+								loader.load(
+									// resource URL
+									'model/logo_blender.glb',
+									// called when the resource is loaded
+									function ( gltf ) {
 
-        }
-    }
-}
+										const ring_logo = gltf.scene.children[ 2 ];
+										const cent_logo = gltf.scene.children[ 3 ];
 
-function onMouseUp(event) {
-    isMouseDown = false;
-}
+										const animation_ring = gltf.animations[ 2 ];
+										const animation_cent = gltf.animations[ 3 ];
 
-function getMouseX(event) {
-    if (event.type.indexOf("touch") == -1)
-        return event.clientX;
-    else
-        return event.touches[0].clientX;
-}
+										const mixer_ring = new THREE.AnimationMixer( ring_logo );
+										const mixer_cent = new THREE.AnimationMixer( cent_logo );
+										mixers.push( mixer_ring );
+										mixers.push( mixer_cent );
 
-function getMouseY(event) {
-    if (event.type.indexOf("touch") == -1)
-        return event.clientY;
-    else
-        return event.touches[0].clientY;
-}
+										const action_ring = mixer_ring.clipAction( animation_ring );
+										const action_cent = mixer_cent.clipAction( animation_cent );
+										action_ring.play();
+										action_cent.play();
 
-window.addEventListener('DOMContentLoaded', init);
+										scene.add( ring_logo, cent_logo);
+
+									},
+									// called when loading is in progresses
+									function ( xhr ) {
+
+											console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+									},
+									// called when loading has errors
+									function ( error ) {
+
+											console.log( 'An error happened' );
+
+								});
+
+									document.addEventListener("mousedown", onMouseDown);
+									document.addEventListener("touchstart", onMouseDown);
+									document.addEventListener("mouseup", onMouseUp);
+									document.addEventListener("touchend", onMouseUp);
+									document.addEventListener("mousemove", onMouseMove);
+									document.addEventListener("touchmove", onMouseMove);
+
+
+									renderer.setAnimationLoop( () => {
+										update();
+										render();
+
+									});
+
+							}
+
+			function render() {
+				renderer.render(scene, camera); 
+			}
+
+			function update() {
+				const delta = clock.getDelta();
+					for ( const mixer of mixers ) {
+						mixer.update( delta );
+					}
+			}
+
+			function onMouseDown(event) {
+				isMouseDown = true;
+			}
+
+			function onMouseMove(event) {
+				if (isMouseDown) {
+					if ( scene ) {
+						scene.rotation.y = getMouseX(event)/50;
+						scene.rotation.x = getMouseY(event)/50;
+					}
+				}
+			}
+
+			function onMouseUp(event) {
+				isMouseDown = false;
+			}
+
+			function getMouseX(event) {
+				if (event.type.indexOf("touch") == -1)
+					return event.clientX;
+				else
+					return event.touches[0].clientX;
+			}
+
+			function getMouseY(event) {
+				if (event.type.indexOf("touch") == -1)
+					return event.clientY;
+				else
+					return event.touches[0].clientY;
+			}
+
+			window.addEventListener('DOMContentLoaded', init);
+
 		</script>	
 
 	</body>
