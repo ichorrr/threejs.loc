@@ -12,9 +12,10 @@ HTML, BODY {
 
 #container {
 	background: #ff5959;
+    width: 100%;
+    height: 100%;
 }
 
-#webcanvas {
-	
-background: #ff5959;
+canvas {
+    display: block;
 }
