@@ -26,8 +26,8 @@
 
 						function init() {
                             
-                            container = document.createElement( 'div' );
-				            document.body.appendChild( container );
+                            container = document.getElementById( 'clogo' );
+				            
                             
 							scene = new THREE.Scene(); 
 
@@ -35,11 +35,14 @@
 							camera.position.z = 70; 
 
 
-							renderer = new THREE.WebGLRenderer( { antialias: true, premultipliedAlpha: false } ); 
+							renderer = new THREE.WebGLRenderer( { 
+                                antialias: true, 
+                                alpha: true, 
+                                premultipliedAlpha: false } ); 
                             
                             renderer.setPixelRatio( window.devicePixelRatio );
-							renderer.setSize( window.innerWidth, window.innerHeight); 
-							container.appendChild( renderer.domElement ); 
+							container.appendChild( renderer.domElement );
+                            renderer.setSize( container.clientWidth, container.clientHeight );
 							renderer.gammaFactor = 2.2;
 							renderer.gammaOutput = true;
 
@@ -61,7 +64,7 @@
 
 								loader.load(
 									// resource URL
-									'model/logo_blender2.glb',
+									'model/logo_blender.glb',
 									// called when the resource is loaded
 									function ( gltf ) {
 
@@ -161,11 +164,11 @@
             function onWindowResize() {
                 camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( container.clientWidth, container.clientHeight );
 			}
             
 		</script>	
 
 	</body>
-
+    <div id="clogo"></div>
 </html>
