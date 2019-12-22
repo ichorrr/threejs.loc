@@ -8,7 +8,8 @@ HTML, BODY {
 	min-height:100%;
 	height: 100%;
 	width: 100%;
-    background: #60cfea;
+    background-image: url(../img/backgr.jpg);
+    background-size: cover;
 }
 
 #clogo {
