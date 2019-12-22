@@ -43,11 +43,11 @@
                             renderer.setPixelRatio( window.devicePixelRatio );
 							container.appendChild( renderer.domElement );
                             renderer.setSize( container.clientWidth, container.clientHeight );
-							renderer.gammaFactor = 2.2;
+							renderer.gammaFactor = 1.2;
 							renderer.gammaOutput = true;
 
-							let light = new THREE.DirectionalLight("#ffffff", 2);
-							let ambient = new THREE.AmbientLight("#ffffff");
+							let light = new THREE.DirectionalLight("#72a1e5", 0.8);
+							let ambient = new THREE.AmbientLight("#7aabfa");
 							light.position.set( 0, -170, 100 ).normalize();
 							scene.add(light);
 							scene.add(ambient);
